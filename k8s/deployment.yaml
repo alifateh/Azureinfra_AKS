@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  namespace: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+        azure.workload.identity/use: "true"
+    spec:
+      serviceAccountName: app-sa
+      containers:
+        - name: python-app
+          image: acrali.azurecr.io/pythonapp:v1
+          ports:
+            - containerPort: 8080
+          env:
+            - name: KEY_VAULT_URL
+              value: "https://kv-ITC-ali.vault.azure.net/"
+            - name: SECRET_NAME
+              value: "dbpass"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
